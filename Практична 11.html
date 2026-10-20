@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Інтерактивний зошит — Біологія 11 клас</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.woff2" rel="stylesheet">
+<style>
+@import url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin.css');
+@import url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700.css');
+
+* { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+
+body {
+  background: linear-gradient(135deg, #e0f2e9 0%, #d1e8f5 50%, #e8dff5 100%);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.notebook {
+  max-width: 960px;
+  margin: 20px auto;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+  overflow: hidden;
+  position: relative;
+}
+
+.notebook::before {
+  content: '';
+  position: absolute;
+  left: 50px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(220, 50, 50, 0.2);
+  z-index: 1;
+}
+
+.notebook-header {
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+  color: white;
+  padding: 40px 40px 30px 80px;
+  position: relative;
+}
+
+.notebook-header::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.05), transparent);
+}
+
+.section {
+  padding: 30px 40px 30px 80px;
+  border-bottom: 1px dashed #e0e0e0;
+  position: relative;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-number {
+  position: absolute;
+  left: 15px;
+  top: 35px;
+  width: 28px;
+  height: 28px;
+  background: #2d6a4f;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+h1 { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
+h2 { font-size: 18px; font-weight: 700; color: #2d6a4f; margin: 0 0 15px; }
+h3 { font-size: 15px; font-weight: 700; color: #40916c; margin: 0 0 10px; }
+
+.theory-box {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px 0;
+  line-height: 1.7;
+  font-size: 14px;
+  color: #1a3a2a;
+}
+
+.theory-box strong { color: #166534; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+  font-size: 13px;
+}
+
+th {
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+  color: white;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  border: 1px solid #d1d5db;
+  padding: 8px 10px;
+  vertical-align: top;
+}
+
+tr:nth-child(even) { background: #f9fafb; }
+
+input[type="text"], textarea, select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s;
+  background: #fafafa;
+}
+
+input[type="text"]:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #40916c;
+  box-shadow: 0 0 0 3px rgba(64, 145, 108, 0.15);
+  background: white;
+}
+
+textarea { resize: vertical; min-height: 80px; }
+
+.organism-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.organism-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.organism-card:hover {
+  border-color: #40916c;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(64, 145, 108, 0.15);
+}
+
+.organism-card.selected {
+  border-color: #2d6a4f;
+  background: #f0fdf4;
+  box-shadow: 0 8px 25px rgba(45, 106, 79, 0.2);
+}
+
+.organism-card svg {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 10px;
+  display: block;
+}
+
+.organism-card .name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.organism-card .num {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #2d6a4f;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.btn {
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(45, 106, 79, 0.3);
+}
+
+.btn-send {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: white;
+}
+
+.btn-send:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(29, 78, 216, 0.3);
+}
+
+.btn-reset {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-reset:hover { background: #e5e7eb; }
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2d6a4f, #52b788);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.grade-display {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 2px solid #f59e0b;
+  border-radius: 14px;
+  padding: 25px;
+  text-align: center;
+  margin: 20px 0;
+  display: none;
+}
+
+.grade-display.show { display: block; animation: fadeIn 0.5s ease; }
+
+.grade-number {
+  font-size: 48px;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.criteria-list {
+  text-align: left;
+  margin: 15px 0;
+}
+
+.criteria-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  font-size: 13px;
+}
+
+.criteria-item .score {
+  font-weight: 700;
+  color: #2d6a4f;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-green { background: #d1fae5; color: #065f46; }
+.badge-blue { background: #dbeafe; color: #1e40af; }
+.badge-purple { background: #ede9fe; color: #5b21b6; }
+
+.question-block {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px 0;
+}
+
+.question-block label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.status-dot.pending { background: #d1d5db; }
+.status-dot.done { background: #10b981; }
+
+.footer-bar {
+  background: #f9fafb;
+  padding: 20px 40px 20px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .notebook::before { left: 20px; }
+  .section, .notebook-header, .footer-bar { padding-left: 45px; padding-right: 20px; }
+  .organism-cards { grid-template-columns: repeat(2, 1fr); }
+  .section-number { left: 5px; }
+}
+
+.hint-text {
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+  margin-top: 5px;
+}
+
+.completion-indicator {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 15px 0;
+}
+
+.completion-chip {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s;
+}
+
+.completion-chip.active {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #6ee7b7;
+}
+
+.teacher-form input {
+  margin-bottom: 10px;
+}
+
+.success-animation {
+  animation: successPop 0.5s ease;
+}
+
+@keyframes successPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="notebook">
+  <!-- HEADER -->
+  <div class="notebook-header">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+      <div>
+        <div style="font-size:12px; opacity:0.8; margin-bottom:5px;">📘 БІОЛОГІЯ І ЕКОЛОГІЯ • 11 КЛАС • 2026–2027 н.р.</div>
+        <h1>Практична робота</h1>
+        <p style="font-size:14px; opacity:0.9; margin:5px 0 0;">Визначення ознак адаптованості різних організмів до середовища існування</p>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:12px; opacity:0.8;">Учень/учениця:</div>
+        <input type="text" id="studentName" placeholder="Прізвище та ім'я" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white; width:200px; margin-top:4px;">
+      </div>
+    </div>
+    <div style="margin-top:15px;">
+      <div style="font-size:12px; opacity:0.8;">Прогрес виконання</div>
+      <div class="progress-bar" style="background:rgba(255,255,255,0.2);">
+        <div class="progress-fill" id="progressBar" style="width:0%; background:linear-gradient(90deg, #a7f3d0, #34d399);"></div>
+      </div>
+      <div style="font-size:11px; opacity:0.7;" id="progressText">0% завершено</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: THEORY -->
+  <div class="section">
+    <div class="section-number">📖</div>
+    <h2>Навчальна інформація</h2>
+    <div class="theory-box">
+      <p><strong>Адаптація</strong> — здатність живого організму пристосовуватися до мінливих умов навколишнього середовища, що виробилась у процесі еволюційного розвитку.</p>
+      <p style="margin-top:10px;">Адаптація має велике значення для організму людини і всіх живих істот. Вона дозволяє не тільки переносити значні зміни в навколишньому середовищі, а й активно перебудовувати свої фізіологічні функції, поведінку відповідно до цих змін, іноді випереджаючи їх. Завдяки адаптації підтримується сталість внутрішнього середовища організму.</p>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
+      <span class="badge badge-green">🔬 Структурні</span>
+      <span class="badge badge-blue">⚡ Фізіологічні</span>
+      <span class="badge badge-purple">🧠 Етологічні</span>
+    </div>
+  </div>
+
+  <!-- SECTION 2: TASK 1 -->
+  <div class="section">
+    <div class="section-number">1</div>
+    <h2>Завдання 1. Типи адаптацій</h2>
+    <p style="font-size:13px; color:#6b7280; margin-bottom:15px;">Наведіть приклади адаптацій з кожної групи та визначте їхнє значення.</p>
+    
+    <table>
+      <thead>
+        <tr>
+          <th style="width:25%;">Група адаптацій</th>
+          <th style="width:35%;">Характеристика</th>
+          <th style="width:40%;">Приклади</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Структурні</strong><br><span class="hint-text">(морфологічні)</span></td>
+          <td><textarea id="struct_char" placeholder="Опишіть, що характеризують структурні адаптації..." rows="3"></textarea></td>
+          <td><textarea id="struct_ex" placeholder="Наведіть приклади структурних адаптацій..." rows="3"></textarea></td>
+        </tr>
+        <tr>
+          <td><strong>2. Фізіологічні</strong><br><span class="hint-text">(біохімічні)</span></td>
+          <td><textarea id="phys_char" placeholder="Опишіть, що характеризують фізіологічні адаптації..." rows="3"></textarea></td>
+          <td><textarea id="phys_ex" placeholder="Наведіть приклади фізіологічних адаптацій..." rows="3"></textarea></td>
+        </tr>
+        <tr>
+          <td><strong>3. Етологічні</strong><br><span class="hint-text">(поведінкові)</span></td>
+          <td><textarea id="etho_char" placeholder="Опишіть, що характеризують етологічні адаптації..." rows="3"></textarea></td>
+          <td><textarea id="etho_ex" placeholder="Наведіть приклади етологічних адаптацій..." rows="3"></textarea></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 3: TASK 2 -->
+  <div class="section">
+    <div class="section-number">2</div>
+    <h2>Завдання 2. Пристосування організмів</h2>
+    <p style="font-size:13px; color:#6b7280; margin-bottom:15px;">Розгляньте організми та заповніть таблицю пристосувань до навколишнього середовища.</p>
+
+    <div class="organism-cards">
+      <!-- Заєць -->
+      <div class="organism-card" onclick="selectOrganism(1)" id="card1">
+        <div class="num">1</div>
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="65" rx="25" ry="20" fill="#d4c5a9"/>
+          <circle cx="50" cy="42" r="16" fill="#d4c5a9"/>
+          <ellipse cx="42" cy="20" rx="5" ry="18" fill="#d4c5a9"/>
+          <ellipse cx="58" cy="20" rx="5" ry="18" fill="#d4c5a9"/>
+          <ellipse cx="42" cy="20" rx="3" ry="14" fill="#f0c0c0"/>
+          <ellipse cx="58" cy="20" rx="3" ry="14" fill="#f0c0c0"/>
+          <circle cx="44" cy="40" r="2.5" fill="#333"/>
+          <circle cx="56" cy="40" r="2.5" fill="#333"/>
+          <ellipse cx="50" cy="46" rx="2" ry="1.5" fill="#ff9999"/>
+          <circle cx="72" cy="70" r="6" fill="#fff"/>
+          <line x1="30" y1="44" x2="18" y2="42" stroke="#999" stroke-width="0.8"/>
+          <line x1="30" y1="46" x2="18" y2="48" stroke="#999" stroke-width="0.8"/>
+          <line x1="70" y1="44" x2="82" y2="42" stroke="#999" stroke-width="0.8"/>
+          <line x1="70" y1="46" x2="82" y2="48" stroke="#999" stroke-width="0.8"/>
+        </svg>
+        <div class="name">Заєць</div>
+      </div>
+
+      <!-- Блоха -->
+      <div class="organism-card" onclick="selectOrganism(2)" id="card2">
+        <div class="num">2</div>
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="55" rx="18" ry="22" fill="#4a2c17"/>
+          <circle cx="50" cy="35" r="10" fill="#5c3a22"/>
+          <circle cx="47" cy="33" r="2" fill="#111"/>
+          <line x1="42" y1="28" x2="35" y2="20" stroke="#333" stroke-width="1.5"/>
+          <line x1="58" y1="28" x2="65" y2="20" stroke="#333" stroke-width="1.5"/>
+          <path d="M 35 50 Q 25 45 20 55" stroke="#4a2c17" stroke-width="3" fill="none"/>
+          <path d="M 65 50 Q 75 45 80 55" stroke="#4a2c17" stroke-width="3" fill="none"/>
+          <path d="M 38 65 Q 28 70 25 80" stroke="#4a2c17" stroke-width="3" fill="none"/>
+          <path d="M 62 65 Q 72 70 75 80" stroke="#4a2c17" stroke-width="3" fill="none"/>
+          <path d="M 40 72 Q 30 80 28 88" stroke="#4a2c17" stroke-width="2.5" fill="none"/>
+          <path d="M 60 72 Q 70 80 72 88" stroke="#4a2c17" stroke-width="2.5" fill="none"/>
+          <line x1="38" y1="48" x2="32" y2="46" stroke="#6b4226" stroke-width="1"/>
+          <line x1="38" y1="52" x2="32" y2="52" stroke="#6b4226" stroke-width="1"/>
+          <line x1="62" y1="48" x2="68" y2="46" stroke="#6b4226" stroke-width="1"/>
+          <line x1="62" y1="52" x2="68" y2="52" stroke="#6b4226" stroke-width="1"/>
+        </svg>
+        <div class="name">Блоха</div>
+      </div>
+
+      <!-- Кріт -->
+      <div class="organism-card" onclick="selectOrganism(3)" id="card3">
+        <div class="num">3</div>
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="58" rx="28" ry="22" fill="#555"/>
+          <circle cx="50" cy="40" r="18" fill="#666"/>
+          <ellipse cx="38" cy="38" r="3" ry="2" fill="#222"/>
+          <ellipse cx="62" cy="38" r="3" ry="2" fill="#222"/>
+          <ellipse cx="50" cy="45" rx="4" ry="3" fill="#ff9999"/>
+          <ellipse cx="22" cy="60" rx="12" ry="8" fill="#777" transform="rotate(-20 22 60)"/>
+          <ellipse cx="78" cy="60" rx="12" ry="8" fill="#777" transform="rotate(20 78 60)"/>
+          <line x1="16" y1="55" x2="10" y2="50" stroke="#888" stroke-width="2"/>
+          <line x1="18" y1="58" x2="10" y2="56" stroke="#888" stroke-width="2"/>
+          <line x1="16" y1="62" x2="10" y2="62" stroke="#888" stroke-width="2"/>
+          <line x1="84" y1="55" x2="90" y2="50" stroke="#888" stroke-width="2"/>
+          <line x1="82" y1="58" x2="90" y2="56" stroke="#888" stroke-width="2"/>
+          <line x1="84" y1="62" x2="90" y2="62" stroke="#888" stroke-width="2"/>
+        </svg>
+        <div class="name">Кріт</div>
+      </div>
+
+      <!-- Бджола -->
+      <div class="organism-card" onclick="selectOrganism(4)" id="card4">
+        <div class="num">4</div>
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="58" rx="20" ry="18" fill="#f5c542"/>
+          <rect x="35" y="50" width="30" height="5" fill="#333" rx="2"/>
+          <rect x="35" y="60" width="30" height="5" fill="#333" rx="2"/>
+          <rect x="35" y="70" width="30" height="4" fill="#333" rx="2"/>
+          <circle cx="50" cy="38" r="12" fill="#333"/>
+          <circle cx="45" cy="35" r="4" fill="#fff"/>
+          <circle cx="55" cy="35" r="4" fill="#fff"/>
+          <circle cx="45" cy="35" r="2" fill="#111"/>
+          <circle cx="55" cy="35" r="2" fill="#111"/>
+          <ellipse cx="30" cy="42" rx="15" ry="8" fill="rgba(200,220,255,0.5)" transform="rotate(-30 30 42)"/>
+          <ellipse cx="70" cy="42" rx="15" ry="8" fill="rgba(200,220,255,0.5)" transform="rotate(30 70 42)"/>
+          <line x1="45" y1="28" x2="40" y2="18" stroke="#333" stroke-width="1.5"/>
+          <line x1="55" y1="28" x2="60" y2="18" stroke="#333" stroke-width="1.5"/>
+          <circle cx="40" cy="17" r="2" fill="#333"/>
+          <circle cx="60" cy="17" r="2" fill="#333"/>
+        </svg>
+        <div class="name">Бджола</div>
+      </div>
+
+      <!-- Дельфін -->
+      <div class="organism-card" onclick="selectOrganism(5)" id="card5">
+        <div class="num">5</div>
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 15 55 Q 30 35 55 40 Q 75 42 85 50 Q 90 55 85 60 Q 75 68 55 65 Q 30 68 15 55 Z" fill="#6ba3be"/>
+          <path d="M 85 50 Q 95 40 98 35 Q 92 42 88 48" fill="#6ba3be"/>
+          <path d="M 85 60 Q 95 70 98 75 Q 92 68 88 62" fill="#6ba3be"/>
+          <path d="M 50 40 Q 52 28 55 25 Q 54 32 53 40" fill="#5a93ae"/>
+          <circle cx="30" cy="50" r="2.5" fill="#111"/>
+          <path d="M 15 55 Q 12 52 10 55" fill="#6ba3be"/>
+          <path d="M 35 55 Q 45 58 60 56" stroke="#4a839e" stroke-width="0.8" fill="none"/>
+          <ellipse cx="45" cy="55" rx="20" ry="5" fill="rgba(255,255,255,0.15)"/>
+        </svg>
+        <div class="name">Дельфін</div>
+      </div>
+
+      <!-- Кактус -->
+      <div class="organism-card" onclick="selectOrganism(6)" id="card6">
+        <div class="num">6</div>
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="25" width="20" height="55" rx="10" fill="#2d8a4e"/>
+          <rect x="15" y="40" width="12" height="30" rx="6" fill="#2d8a4e"/>
+          <rect x="73" y="35" width="12" height="35" rx="6" fill="#2d8a4e"/>
+          <path d="M 27 55 L 40 55" stroke="#2d8a4e" stroke-width="8" stroke-linecap="round"/>
+          <path d="M 60 50 L 73 50" stroke="#2d8a4e" stroke-width="8" stroke-linecap="round"/>
+          <line x1="45" y1="30" x2="44" y2="26" stroke="#90c96e" stroke-width="1"/>
+          <line x1="50" y1="35" x2="51" y2="31" stroke="#90c96e" stroke-width="1"/>
+          <line x1="55" y1="40" x2="57" y2="37" stroke="#90c96e" stroke-width="1"/>
+          <line x1="45" y1="45" x2="43" y2="42" stroke="#90c96e" stroke-width="1"/>
+          <line x1="55" y1="55" x2="57" y2="52" stroke="#90c96e" stroke-width="1"/>
+          <line x1="45" y1="60" x2="43" y2="57" stroke="#90c96e" stroke-width="1"/>
+          <line x1="55" y1="65" x2="57" y2="62" stroke="#90c96e" stroke-width="1"/>
+          <line x1="18" y1="45" x2="16" y2="42" stroke="#90c96e" stroke-width="1"/>
+          <line x1="22" y1="55" x2="20" y2="52" stroke="#90c96e" stroke-width="1"/>
+          <line x1="76" y1="40" x2="74" y2="37" stroke="#90c96e" stroke-width="1"/>
+          <line x1="80" y1="50" x2="82" y2="47" stroke="#90c96e" stroke-width="1"/>
+          <line x1="76" y1="60" x2="74" y2="57" stroke="#90c96e" stroke-width="1"/>
+          <circle cx="50" cy="22" r="5" fill="#ff6b9d"/>
+          <circle cx="50" cy="22" r="2" fill="#ffcc00"/>
+          <rect x="35" y="80" width="30" height="8" rx="2" fill="#c4956a"/>
+        </svg>
+        <div class="name">Кактус</div>
+      </div>
+    </div>
+
+    <div id="organismDetail" style="display:none; margin-top:20px;">
+      <h3 id="organismTitle"></h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Параметр</th>
+            <th>Ваша відповідь</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Середовище існування</strong></td>
+            <td><input type="text" id="org_env" placeholder="Вкажіть середовище існування..."></td>
+          </tr>
+          <tr>
+            <td><strong>Екологічна група</strong></td>
+            <td>
+              <select id="org_group">
+                <option value="">— Оберіть —</option>
+                <option value="Наземно-повітряне">Наземно-повітряне</option>
+                <option value="Водне">Водне</option>
+                <option value="Ґрунтове">Ґрунтове</option>
+                <option value="Організмове">Організмове</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Тип адаптації</strong></td>
+            <td>
+              <select id="org_type">
+                <option value="">— Оберіть —</option>
+                <option value="Структурна">Структурна (морфологічна)</option>
+                <option value="Фізіологічна">Фізіологічна (біохімічна)</option>
+                <option value="Етологічна">Етологічна (поведінкова)</option>
+                <option value="Комбінована">Комбінована</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Адаптивні ознаки</strong></td>
+            <td><textarea id="org_signs" placeholder="Опишіть адаптивні ознаки цього організму..." rows="3"></textarea></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px; display:flex; gap:10px;">
+        <button class="btn btn-primary" onclick="saveOrganism()" style="font-size:13px; padding:8px 18px;">💾 Зберегти</button>
+        <button class="btn btn-reset" onclick="closeOrganism()" style="font-size:13px; padding:8px 18px;">✕ Закрити</button>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <h3>Заповнена таблиця:</h3>
+      <table id="resultTable">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Організм</th>
+            <th>Середовище</th>
+            <th>Екол. група</th>
+            <th>Тип адаптації</th>
+            <th>Адаптивні ознаки</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody id="resultTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 4: CONCLUSION -->
+  <div class="section">
+    <div class="section-number">3</div>
+    <h2>Висновок</h2>
+    <p style="font-size:13px; color:#6b7280; margin-bottom:10px;">Зробіть висновок про вплив екологічних факторів на пристосованість організмів у різних середовищах існування.</p>
+    <textarea id="conclusion" placeholder="Висновок: Екологічні фактори (світло, температура, вологість тощо) впливають на..." rows="5" style="min-height:120px;"></textarea>
+  </div>
+
+  <!-- SECTION 5: QUESTIONS -->
+  <div class="section">
+    <div class="section-number">4</div>
+    <h2>Контрольні запитання</h2>
+
+    <div class="question-block">
+      <label>1. Яку роль відіграють адаптації у природі?</label>
+      <textarea id="q1" placeholder="Ваша відповідь..." rows="2"></textarea>
+    </div>
+
+    <div class="question-block">
+      <label>2. Назвіть найбільш поширені адаптації?</label>
+      <textarea id="q2" placeholder="Ваша відповідь..." rows="2"></textarea>
+    </div>
+
+    <div class="question-block">
+      <label>3. Чи виникають пристосувальні зміни у сучасних організмів?</label>
+      <textarea id="q3" placeholder="Ваша відповідь..." rows="2"></textarea>
+    </div>
+
+    <div class="question-block">
+      <label>4. Яке середовище існування вимагає найбільшої кількості пристосувань?</label>
+      <textarea id="q4" placeholder="Ваша відповідь..." rows="2"></textarea>
+    </div>
+
+    <div class="question-block">
+      <label>5. Яку роль відіграють адаптації у житті людини?</label>
+      <textarea id="q5" placeholder="Ваша відповідь..." rows="2"></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 6: GRADE -->
+  <div class="section">
+    <div class="section-number">⭐</div>
+    <h2>Оцінювання роботи</h2>
+    <p style="font-size:13px; color:#6b7280; margin-bottom:10px;">Оцінювання за критеріями (максимум 12 балів)</p>
+
+    <div class="completion-indicator" id="completionIndicator">
+      <span class="completion-chip" id="chip1">📝 Завдання 1</span>
+      <span class="completion-chip" id="chip2">🔬 Завдання 2</span>
+      <span class="completion-chip" id="chip3">📊 Висновок</span>
+      <span class="completion-chip" id="chip4">❓ Питання</span>
+    </div>
+
+    <div class="grade-display" id="gradeDisplay">
+      <div style="font-size:14px; color:#92400e; margin-bottom:5px;">Ваша оцінка:</div>
+      <div class="grade-number" id="gradeNumber">0</div>
+      <div style="font-size:14px; color:#92400e;">/ 12 балів</div>
+      <div id="gradeLabel" style="font-size:16px; font-weight:600; margin-top:10px; color:#78350f;"></div>
+      
+      <div class="criteria-list" id="criteriaList"></div>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
+      <button class="btn btn-primary" onclick="checkWork()">🔍 Перевірити роботу</button>
+      <button class="btn btn-send" onclick="sendToTeacher()">📤 Надіслати вчителю</button>
+      <button class="btn btn-reset" onclick="resetWork()">🔄 Почати спочатку</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-bar">
+    <div style="font-size:12px; color:#9ca3af;">
+      📘 Біологія і екологія • 11 клас • 2026–2027 н.р.
+    </div>
+    <div style="font-size:12px; color:#9ca3af;" id="timestamp"></div>
+  </div>
+</div>
+
+<!-- MODAL: Send to teacher -->
+<div class="modal-overlay" id="sendModal">
+  <div class="modal">
+    <h2 style="margin-bottom:15px;">📤 Надіслати результати вчителю</h2>
+    <div class="teacher-form">
+      <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">Email вчителя:</label>
+      <input type="text" id="teacherEmail" placeholder="teacher@school.ua">
+      <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px; margin-top:10px;">Ваше ім'я:</label>
+      <input type="text" id="studentNameModal" placeholder="Прізвище та ім'я">
+      <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px; margin-top:10px;">Коментар (необов'язково):</label>
+      <textarea id="comment" placeholder="Додатковий коментар..." rows="2"></textarea>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn btn-send" onclick="confirmSend()">📨 Надіслати</button>
+      <button class="btn btn-reset" onclick="closeModal()">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Success -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal" style="text-align:center;">
+    <div style="font-size:60px; margin-bottom:15px;" class="success-animation">✅</div>
+    <h2 style="color:#065f46;">Результати надіслано!</h2>
+    <p style="font-size:14px; color:#6b7280; margin:10px 0;">Ваші результати успішно надіслані вчителю. Очікуйте на перевірку.</p>
+    <div style="background:#f0fdf4; border-radius:10px; padding:15px; margin:15px 0; text-align:left; font-size:13px;">
+      <div><strong>Учень:</strong> <span id="sentName"></span></div>
+      <div><strong>Оцінка:</strong> <span id="sentGrade"></span></div>
+      <div><strong>Дата:</strong> <span id="sentDate"></span></div>
+    </div>
+    <button class="btn btn-primary" onclick="closeSuccessModal()">Закрити</button>
+  </div>
+</div>
+
+<script>
+const organismNames = ['Заєць', 'Блоха', 'Кріт', 'Бджола', 'Дельфін', 'Кактус'];
+const organismData = {};
+let currentOrganism = null;
+let currentGrade = 0;
+
+function selectOrganism(num) {
+  document.querySelectorAll('.organism-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card' + num).classList.add('selected');
+  currentOrganism = num;
+  
+  document.getElementById('organismDetail').style.display = 'block';
+  document.getElementById('organismTitle').textContent = '🔬 ' + organismNames[num-1] + ' — Заповніть дані';
+  
+  // Load saved data if exists
+  if (organismData[num]) {
+    document.getElementById('org_env').value = organismData[num].env || '';
+    document.getElementById('org_group').value = organismData[num].group || '';
+    document.getElementById('org_type').value = organismData[num].type || '';
+    document.getElementById('org_signs').value = organismData[num].signs || '';
+  } else {
+    document.getElementById('org_env').value = '';
+    document.getElementById('org_group').value = '';
+    document.getElementById('org_type').value = '';
+    document.getElementById('org_signs').value = '';
+  }
+  
+  document.getElementById('organismDetail').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function saveOrganism() {
+  if (!currentOrganism) return;
+  
+  organismData[currentOrganism] = {
+    env: document.getElementById('org_env').value,
+    group: document.getElementById('org_group').value,
+    type: document.getElementById('org_type').value,
+    signs: document.getElementById('org_signs').value
+  };
+  
+  updateResultTable();
+  updateProgress();
+  closeOrganism();
+}
+
+function closeOrganism() {
+  document.getElementById('organismDetail').style.display = 'none';
+  document.querySelectorAll('.organism-card').forEach(c => c.classList.remove('selected'));
+  currentOrganism = null;
+}
+
+function updateResultTable() {
+  const tbody = document.getElementById('resultTableBody');
+  tbody.innerHTML = '';
+  
+  for (let i = 1; i <= 6; i++) {
+    const data = organismData[i];
+    const filled = data && data.env && data.group && data.type && data.signs;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i}</td>
+      <td><strong>${organismNames[i-1]}</strong></td>
+      <td>${data ? data.env || '—' : '—'}</td>
+      <td>${data ? data.group || '—' : '—'}</td>
+      <td>${data ? data.type || '—' : '—'}</td>
+      <td style="font-size:12px;">${data ? data.signs || '—' : '—'}</td>
+      <td>${filled ? '<span class="status-dot done"></span>✓' : '<span class="status-dot pending"></span>...'}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function updateProgress() {
+  let total = 0;
+  let filled = 0;
+  
+  // Task 1: 6 fields
+  total += 6;
+  ['struct_char','struct_ex','phys_char','phys_ex','etho_char','etho_ex'].forEach(id => {
+    if (document.getElementById(id).value.trim().length > 5) filled++;
+  });
+  
+  // Task 2: 6 organisms x 4 fields
+  for (let i = 1; i <= 6; i++) {
+    total += 4;
+    if (organismData[i]) {
+      if (organismData[i].env && organismData[i].env.trim().length > 2) filled++;
+      if (organismData[i].group) filled++;
+      if (organismData[i].type) filled++;
+      if (organismData[i].signs && organismData[i].signs.trim().length > 5) filled++;
+    }
+  }
+  
+  // Conclusion
+  total += 1;
+  if (document.getElementById('conclusion').value.trim().length > 20) filled++;
+  
+  // Questions
+  total += 5;
+  ['q1','q2','q3','q4','q5'].forEach(id => {
+    if (document.getElementById(id).value.trim().length > 10) filled++;
+  });
+  
+  const percent = Math.round((filled / total) * 100);
+  document.getElementById('progressBar').style.width = percent + '%';
+  document.getElementById('progressText').textContent = percent + '% завершено';
+  
+  // Update chips
+  const task1Done = ['struct_char','struct_ex','phys_char','phys_ex','etho_char','etho_ex'].every(id => document.getElementById(id).value.trim().length > 5);
+  const task2Done = Object.keys(organismData).length >= 6 && Object.values(organismData).every(d => d.env && d.group && d.type && d.signs);
+  const conclusionDone = document.getElementById('conclusion').value.trim().length > 20;
+  const questionsDone = ['q1','q2','q3','q4','q5'].every(id => document.getElementById(id).value.trim().length > 10);
+  
+  document.getElementById('chip1').classList.toggle('active', task1Done);
+  document.getElementById('chip2').classList.toggle('active', task2Done);
+  document.getElementById('chip3').classList.toggle('active', conclusionDone);
+  document.getElementById('chip4').classList.toggle('active', questionsDone);
+}
+
+function checkWork() {
+  let grade = 0;
+  const criteria = [];
+  
+  // Criterion 1: Task 1 (max 3 points)
+  let task1Score = 0;
+  ['struct_char','struct_ex','phys_char','phys_ex','etho_char','etho_ex'].forEach(id => {
+    const val = document.getElementById(id).value.trim();
+    if (val.length > 20) task1Score += 0.5;
+    else if (val.length > 5) task1Score += 0.25;
+  });
+  task1Score = Math.min(task1Score, 3);
+  grade += task1Score;
+  criteria.push({ name: 'Завдання 1: Типи адаптацій', score: task1Score, max: 3 });
+  
+  // Criterion 2: Task 2 (max 3 points)
+  let task2Score = 0;
+  for (let i = 1; i <= 6; i++) {
+    if (organismData[i]) {
+      if (organismData[i].env && organismData[i].env.trim().length > 3) task2Score += 0.15;
+      if (organismData[i].group) task2Score += 0.15;
+      if (organismData[i].type) task2Score += 0.15;
+      if (organismData[i].signs && organismData[i].signs.trim().length > 10) task2Score += 0.05;
+    }
+  }
+  task2Score = Math.min(task2Score, 3);
+  grade += task2Score;
+  criteria.push({ name: 'Завдання 2: Таблиця організмів', score: task2Score, max: 3 });
+  
+  // Criterion 3: Conclusion (max 3 points)
+  let conclusionScore = 0;
+  const conclusionVal = document.getElementById('conclusion').value.trim();
+  if (conclusionVal.length > 100) conclusionScore = 3;
+  else if (conclusionVal.length > 50) conclusionScore = 2;
+  else if (conclusionVal.length > 20) conclusionScore = 1;
+  grade += conclusionScore;
+  criteria.push({ name: 'Висновок', score: conclusionScore, max: 3 });
+  
+  // Criterion 4: Questions (max 3 points)
+  let questionsScore = 0;
+  ['q1','q2','q3','q4','q5'].forEach(id => {
+    const val = document.getElementById(id).value.trim();
+    if (val.length > 30) questionsScore += 0.6;
+    else if (val.length > 10) questionsScore += 0.3;
+  });
+  questionsScore = Math.min(questionsScore, 3);
+  grade += questionsScore;
+  criteria.push({ name: 'Контрольні запитання', score: questionsScore, max: 3 });
+  
+  grade = Math.round(grade * 2) / 2;
+  currentGrade = grade;
+  
+  // Display grade
+  const gradeDisplay = document.getElementById('gradeDisplay');
+  gradeDisplay.classList.add('show');
+  document.getElementById('gradeNumber').textContent = grade;
+  
+  let label = '';
+  if (grade >= 10) label = '🏆 Високий рівень — Відмінно!';
+  else if (grade >= 7) label = '👍 Достатній рівень — Добре!';
+  else if (grade >= 4) label = '📝 Середній рівень — Задовільно';
+  else label = '📚 Початковий рівень — Потрібно доопрацювати';
+  document.getElementById('gradeLabel').textContent = label;
+  
+  // Criteria list
+  const criteriaList = document.getElementById('criteriaList');
+  criteriaList.innerHTML = criteria.map(c => `
+    <div class="criteria-item">
+      <span>${c.name}</span>
+      <span class="score">${c.score} / ${c.max}</span>
+    </div>
+  `).join('');
+  
+  gradeDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendToTeacher() {
+  document.getElementById('sendModal').classList.add('show');
+  document.getElementById('studentNameModal').value = document.getElementById('studentName').value;
+}
+
+function confirmSend() {
+  const name = document.getElementById('studentNameModal').value;
+  const email = document.getElementById('teacherEmail').value;
+  
+  if (!name || !email) {
+    alert('Будь ласка, заповніть ім\'я та email вчителя');
+    return;
+  }
+  
+  if (currentGrade === 0) {
+    if (!confirm('Ви ще не перевірили роботу. Надіслати без оцінки?')) return;
+  }
+  
+  closeModal();
+  
+  // Show success
+  document.getElementById('sentName').textContent = name;
+  document.getElementById('sentGrade').textContent = currentGrade + ' / 12 балів';
+  document.getElementById('sentDate').textContent = new Date().toLocaleDateString('uk-UA', { 
+    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+  });
+  
+  document.getElementById('successModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('sendModal').classList.remove('show');
+}
+
+function closeSuccessModal() {
+  document.getElementById('successModal').classList.remove('show');
+}
+
+function resetWork() {
+  if (!confirm('Ви впевнені? Всі дані буде видалено.')) return;
+  
+  document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+  document.querySelectorAll('select').forEach(el => el.value = '');
+  
+  for (let key in organismData) delete organismData[key];
+  currentGrade = 0;
+  
+  updateResultTable();
+  updateProgress();
+  
+  document.getElementById('gradeDisplay').classList.remove('show');
+  closeOrganism();
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Auto-save & progress tracking
+document.querySelectorAll('input, textarea, select').forEach(el => {
+  el.addEventListener('input', updateProgress);
+  el.addEventListener('change', updateProgress);
+});
+
+// Initialize
+updateResultTable();
+updateProgress();
+
+// Timestamp
+document.getElementById('timestamp').textContent = '📅 ' + new Date().toLocaleDateString('uk-UA', { 
+  year: 'numeric', month: 'long', day: 'numeric' 
+});
+</script>
+
+</body>
+</html>
